@@ -1,8 +1,34 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+// import Image from "next/image";
+import { useCallback, useState } from "react";
+import Leg from "../components/Leg";
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  const [legs, setLegs] = useState([{ value: 1 }, { value: 1 }]);
+
+  const updateLegs = useCallback(
+    (index: number, value: number) => {
+      const newLegs = [...legs];
+      newLegs[index].value = value;
+      setLegs(newLegs);
+    },
+    [legs]
+  );
+
+  const addLeg = useCallback(() => {
+    setLegs([...legs, { value: 1 }]);
+  }, [legs]);
+
+  const deleteLeg = useCallback(
+    (index: number) => {
+      const newLegs = [...legs];
+      newLegs.splice(index, 1);
+      setLegs(newLegs);
+    },
+    [legs]
+  );
+
   return (
     <div className={styles.container}>
       <Head>
@@ -11,61 +37,34 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <main className="h-screen w-screen">
+        <div className="flex items-center">
+          <div className="w-1/2 space-y-4">
+            <button className="bg-blue-400 text-white" onClick={() => addLeg()}>
+              Add Leg
+            </button>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+            {legs.map((leg: { value: any }, index: any) => (
+              <Leg
+                key={index}
+                lot={leg.value}
+                onLotChange={(value: number) => updateLegs(index, value)}
+                onCopy={() => setLegs(() => [...legs, { value: leg.value }])}
+                onDelete={() => deleteLeg(index)}
+              />
+            ))}
+          </div>
+          <div className="bg-gray-800 w-1/2">
+            {legs.map((leg: { value: any }, index: any) => (
+              <div key={index}>
+                <p className="text-white">
+                  {index} : <strong>{leg.value}</strong>
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
     </div>
-  )
+  );
 }
